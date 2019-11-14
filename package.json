@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "npx parcel ./source/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/nekobird/snowfall/issues"
   },
-  "homepage": "https://github.com/nekobird/snowfall#readme"
+  "homepage": "https://github.com/nekobird/snowfall#readme",
+  "dependencies": {
+    "@nekobird/rocket": "0.0.131",
+    "simplex-noise": "^2.4.0"
+  },
+  "devDependencies": {
+    "sass": "^1.23.3"
+  }
 }
