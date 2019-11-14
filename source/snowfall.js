@@ -25,6 +25,7 @@ export default class Snowfall {
 
     this.snows = [];
     this.tickCount = 0;
+    this.pointerPosition = new Vector2();
   }
 
   setConfig(config) {
@@ -37,6 +38,7 @@ export default class Snowfall {
     this.createCanvasElement();
     this.insertCanvasElement();
     this.ticker.start();
+    this.listen();
   }
 
   createCanvasElement() {
@@ -75,7 +77,7 @@ export default class Snowfall {
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
         },
-        this
+        this,
       );
 
       this.snows.push(snow);
@@ -89,8 +91,8 @@ export default class Snowfall {
       this.snows[i].applyForce(new Vector2(0, 1));
       this.snows[i].applyLateralEntropy(this.tickCount * 0.01) 
       this.snows[i].applyFriction(1);
+      this.snows[i].swirlAt(this.pointerPosition);
       this.snows[i].update();
-      
     }
 
     this.tickCount++;
@@ -111,12 +113,18 @@ export default class Snowfall {
         const radius = snow.config.radius;
 
         this.context.beginPath();
-
         const { x, y } = snow.position;
         this.context.arc(x, y, radius, 0, Math.PI * 2);
         this.context.fillStyle = 'white';
         this.context.fill();
       }
     }
+  }
+
+  listen() {
+    window.addEventListener('mousemove', event => {
+      this.pointerPosition.x = event.pageX;
+      this.pointerPosition.y = event.pageY;
+    });
   }
 }

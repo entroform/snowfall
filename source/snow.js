@@ -66,6 +66,12 @@ export default class Snow {
     this.applyForce(force);
   }
 
+  swirlAt(position) {
+    const force = Vector2
+      .getDirection(this.position, position).multiply(0.28);
+    this.applyForce(force)
+  }
+
   update() {
     this.life--;
 
