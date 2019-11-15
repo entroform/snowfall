@@ -6,6 +6,7 @@
   "scripts": {
     "start": "npx parcel ./source/index.html",
     "build": "npx parcel build ./source/index.html --out-dir build/ --public-url /",
+    "build-snowfall": "npx parcel build ./source/snowfall.js --out-dir build-snowfall/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,6 +29,7 @@
     "@babel/plugin-transform-typescript": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-typescript": "^7.7.2",
+    "cssnano": "^4.1.10",
     "sass": "^1.23.3"
   }
 }

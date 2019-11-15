@@ -9,15 +9,18 @@ import {
 } from '@nekobird/rocket';
 import Snow from './snow';
 
-import SnowImage1 from './snow.png';
-import SnowImage2 from './snow-1.png';
-import SnowImage3 from './snow-2.png';
-
 export const SNOWFALL_DEFAULT_CONFIG = {
   targetElement: null,
   resolutionMultiplier: 2,
   maximumNumberOfSnowParticles: 1000,
-  snowParticleTypes: [SnowImage1, SnowImage2, SnowImage3],
+  snowParticleImages: [],
+  prepareCanvasElement: function(canvasElement) {
+    canvasElement.style.width = '100vw';
+    canvasElement.style.height = '100vh';
+    canvasElement.style.maxWidth = '100%';
+    canvasElement.style.maxHeight = '100%';
+    canvasElement.style.margin = '0';
+  },
 };
 
 export default class Snowfall {
@@ -49,16 +52,18 @@ export default class Snowfall {
     this.createCanvasElement();
     this.insertCanvasElement();
 
-    Promise.all(
-      this.config.snowParticleTypes.map(image => {
-        return DOMImage.loadImageFromSource(image).then(data => {
-          this.images.push(data.image);
-          return Promise.resolve();
-        });
-      })
-    ).then(() => this.ticker.start());
-    
-    this.listen();
+    if (this.config.snowParticleImages.length > 0) {
+      Promise.all(
+        this.config.snowParticleImages.map(image => {
+          return DOMImage.loadImageFromSource(image).then(data => {
+            this.images.push(data.image);
+            return Promise.resolve();
+          });
+        })
+      ).then(() => this.ticker.start());
+      
+      this.listen();
+    }
   }
 
   createCanvasElement() {
@@ -80,12 +85,7 @@ export default class Snowfall {
         this.canvasElement,
       );
 
-      this.canvasElement.style.width = '100vw';
-      this.canvasElement.style.height = '100vh';
-      this.canvasElement.style.maxWidth = '100%';
-      this.canvasElement.style.maxHeight = '100%';
-      this.canvasElement.style.margin = '0';
-
+      this.config.prepareCanvasElement(this.canvasElement);
       this.resizeCanvas();
     }
   }
@@ -188,25 +188,8 @@ export default class Snowfall {
   }
 
   listen() {
-    window.addEventListener('mousemove', event => {
-      this.pointerPosition.x = event.pageX;
-      this.pointerPosition.y = event.pageY;
-    });
-
-    window.addEventListener('mousedown', () => this.mouseIsDown = true);
-
-    window.addEventListener('mouseup', () => {
-      this.mouseIsDown = false;
-      this.explodeCounter = 0;
-    });
-
     window.addEventListener('resize', this.resizeHandler.bind(this));
-
-    const handleOrientation = event => {
-      this.orientationVector = Vector2().unit().rotateTo(event.beta * Math.PI / 180);
-      alert(event);
-    }
-
-    window.addEventListener('deviceorientation', handleOrientation, true);
   }
 }
+
+window.Snowfall = Snowfall;

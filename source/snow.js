@@ -78,7 +78,8 @@ export default class Snow {
     const { seedX, seedY } = this.config;
     const x = this.simplex.noise2D(seedX + t, seedY)
     const y = this.simplex.noise2D(seedX, seedY + t)
-    const force = new Vector2(x * 0.5, y * 0.01);
+    // const force = new Vector2(x * 0.5, y * 0.01);
+    const force = new Vector2(x * 0.2 + 0.2, y * 0.01);
     this.applyForce(force);
   }
 
