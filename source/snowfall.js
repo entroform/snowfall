@@ -4,12 +4,13 @@ import {
   Viewport,
   Ticker,
   Vector2,
-  Num,
+  debounce,
 } from '@nekobird/rocket';
 import Snow from './snow';
 
 export const SNOWFALL_DEFAULT_CONFIG = {
   targetElement: null,
+  resolutionMultiplier: 2,
 };
 
 export default class Snowfall {
@@ -25,6 +26,7 @@ export default class Snowfall {
 
     this.snows = [];
     this.pointerPosition = new Vector2();
+    this.mouseIsDown = false;
   }
 
   setConfig(config) {
@@ -58,9 +60,21 @@ export default class Snowfall {
         this.config.targetElement,
         this.canvasElement,
       );
-      this.canvasElement.width = Viewport.width;
-      this.canvasElement.height = Viewport.height;
+
+      this.canvasElement.style.width = '100vw';
+      this.canvasElement.style.height = '100vh';
+      this.canvasElement.style.maxWidth = '100%';
+      this.canvasElement.style.maxHeight = '100%';
+      this.canvasElement.style.margin = '0';
+
+      this.resizeCanvas();
     }
+  }
+
+  resizeCanvas() {
+    const { resolutionMultiplier } = this.config;
+    this.canvasElement.width = Viewport.width * resolutionMultiplier;
+    this.canvasElement.height = Viewport.height * resolutionMultiplier;
   }
 
   spawn() {
@@ -68,7 +82,7 @@ export default class Snowfall {
       const mass = 0.5 + Math.random();
       const snow = new Snow(
         {
-          startingX: Math.random() * Viewport.width,
+          startingX: Math.random() * this.canvasElement.width,
           startingY: -10,
           initialVelocityX: (Math.random() - 0.5) * 4,
           initialVelocityY: 0,
@@ -91,15 +105,25 @@ export default class Snowfall {
       this.snows[i].applyGravity(new Vector2(0, 1));
       this.snows[i].applyLateralEntropy(c * 0.01) 
       this.snows[i].applyFriction(1);
-      this.snows[i].swirlAt(this.pointerPosition);
+
+      if (this.mouseIsDown) {
+        this.snows[i].attract(this.pointerPosition);
+      }
+      if (this.explode) {
+        this.snows[i].repulse(this.pointerPosition);
+      }
+
       this.snows[i].update();
     }
+    this.explode = false;
 
     this.draw(c);
   }
 
   draw() {
     if (this.context) {
+      const m = this.config.resolutionMultiplier;
+
       this.context.clearRect(
         0, 0,
         this.canvasElement.width, this.canvasElement.height,
@@ -108,7 +132,7 @@ export default class Snowfall {
       for (let i = 0; i < this.snows.length; i++) {
         const snow = this.snows[i];
         
-        const radius = snow.config.radius;
+        const radius = snow.config.radius * m;
 
         this.context.beginPath();
         const { x, y } = snow.position;
@@ -119,10 +143,26 @@ export default class Snowfall {
     }
   }
 
+  resizeHandler() {
+    const m = this.config.resolutionMultiplier;
+    this.canvasElement.width = Viewport.width * m;
+    this.canvasElement.height = Viewport.height * m;
+  }
+
   listen() {
     window.addEventListener('mousemove', event => {
-      this.pointerPosition.x = event.pageX;
-      this.pointerPosition.y = event.pageY;
+      const m = this.config.resolutionMultiplier;
+      this.pointerPosition.x = event.pageX * m;
+      this.pointerPosition.y = event.pageY * m;
     });
+
+    window.addEventListener('mousedown', () => this.mouseIsDown = true);
+
+    window.addEventListener('mouseup', () => {
+      this.mouseIsDown = false;
+      this.explode = true;
+    });
+
+    window.addEventListener('resize', this.resizeHandler.bind(this));
   }
 }

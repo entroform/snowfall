@@ -74,18 +74,38 @@ export default class Snow {
     this.applyForce(force);
   }
 
-  swirlAt(position) {
+  attract(position) {
     const directionForce = Vector2.subtract(this.position, position);
     const distance = directionForce.magnitude;
 
-    if (distance < 200) {      
-      const G = 1;
+    if (distance < 400 && distance > 30) {      
+      const G = 2;
+      const mass = 1000;
+      const strength = (G * mass * this.config.mass) / (distance * distance);
+      // const strength = 1;
+
+      directionForce.normalize();
+      directionForce.multiply(-strength);
+      directionForce.multiply(3);
+      this.applyForce(directionForce);
+    }
+  }
+
+  repulse(position) {
+    const directionForce = Vector2.subtract(this.position, position);
+    const distance = directionForce.magnitude;
+
+    if (distance < 500) {      
+      const G = 3;
       const mass = 1000;
       const strength = (G * mass * this.config.mass) / (distance * distance);
       // const strength = 1;
 
       directionForce.normalize();
       directionForce.multiply(strength);
+
+      directionForce.multiply(10000);
+
       this.applyForce(directionForce);
     }
   }
@@ -106,12 +126,9 @@ export default class Snow {
     this.angle += this.angleVelocity;
 
     if (this.position.y > this.snowfall.canvasElement.height) {
+      this.position.x = Math.random() * this.snowfall.canvasElement.width;
       this.position.y = -10;
       this.velocity.multiply(0);
     }
-  }
-
-  die() {
-
   }
 }
