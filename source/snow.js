@@ -1,4 +1,7 @@
-import { Vector2, Num } from '@nekobird/rocket';
+import {
+  Num,
+  Vector2,
+} from '@nekobird/rocket';
 import SimplexNoise from 'simplex-noise';
 
 export const SNOW_DEFAULT_CONFIG = {
@@ -52,10 +55,15 @@ export default class Snow {
       const force = this.velocity
         .clone()
         .normalize()
-        .multiply(-friction);
+        .multiply(-friction)
+        .multiply(this.config.mass);
 
       this.applyForce(force);
     }
+  }
+
+  applyGravity(gravity) {
+    this.applyForce(gravity.multiply(this.config.mass));
   }
 
   applyLateralEntropy(t) {
@@ -67,9 +75,19 @@ export default class Snow {
   }
 
   swirlAt(position) {
-    const force = Vector2
-      .getDirection(this.position, position).multiply(0.28);
-    this.applyForce(force)
+    const directionForce = Vector2.subtract(this.position, position);
+    const distance = directionForce.magnitude;
+
+    if (distance < 200) {      
+      const G = 1;
+      const mass = 1000;
+      const strength = (G * mass * this.config.mass) / (distance * distance);
+      // const strength = 1;
+
+      directionForce.normalize();
+      directionForce.multiply(strength);
+      this.applyForce(directionForce);
+    }
   }
 
   update() {
@@ -79,7 +97,7 @@ export default class Snow {
       this.die();
     }
 
-    this.velocity.add(this.acceleration);
+    this.velocity.add(this.acceleration).limit(10);
     this.position.add(this.velocity);
     this.acceleration.multiply(0);
 

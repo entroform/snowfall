@@ -24,7 +24,6 @@ export default class Snowfall {
     });
 
     this.snows = [];
-    this.tickCount = 0;
     this.pointerPosition = new Vector2();
   }
 
@@ -66,14 +65,15 @@ export default class Snowfall {
 
   spawn() {
     if (this.snows.length < 1000) {
+      const mass = 0.5 + Math.random();
       const snow = new Snow(
         {
           startingX: Math.random() * Viewport.width,
           startingY: -10,
           initialVelocityX: (Math.random() - 0.5) * 4,
           initialVelocityY: 0,
-          radius: Math.random() * 4,
-          mass: 0.5 + Math.random(),
+          radius: mass * 2,
+          mass,
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
         },
@@ -88,14 +88,12 @@ export default class Snowfall {
     this.spawn();
 
     for (let i=0; i < this.snows.length; i++) {
-      this.snows[i].applyForce(new Vector2(0, 1));
-      this.snows[i].applyLateralEntropy(this.tickCount * 0.01) 
+      this.snows[i].applyGravity(new Vector2(0, 1));
+      this.snows[i].applyLateralEntropy(c * 0.01) 
       this.snows[i].applyFriction(1);
       this.snows[i].swirlAt(this.pointerPosition);
       this.snows[i].update();
     }
-
-    this.tickCount++;
 
     this.draw(c);
   }
