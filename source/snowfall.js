@@ -4,9 +4,11 @@ import {
   Viewport,
   Ticker,
   Vector2,
-  debounce,
+  DOMImage,
 } from '@nekobird/rocket';
 import Snow from './snow';
+
+import SnowImage from './snow.png';
 
 export const SNOWFALL_DEFAULT_CONFIG = {
   targetElement: null,
@@ -27,6 +29,8 @@ export default class Snowfall {
     this.snows = [];
     this.pointerPosition = new Vector2();
     this.mouseIsDown = false;
+
+    this.orientationVector = new Vector2(0, 1);
   }
 
   setConfig(config) {
@@ -38,7 +42,12 @@ export default class Snowfall {
   initialize() {
     this.createCanvasElement();
     this.insertCanvasElement();
-    this.ticker.start();
+
+    DOMImage.loadImageFromSource(SnowImage).then(data => {
+      this.image = data.image;
+      this.ticker.start();
+    });
+    
     this.listen();
   }
 
@@ -78,7 +87,7 @@ export default class Snowfall {
   }
 
   spawn() {
-    if (this.snows.length < 1000) {
+    if (this.snows.length <= 300) {
       const mass = 0.5 + Math.random();
       const snow = new Snow(
         {
@@ -86,7 +95,9 @@ export default class Snowfall {
           startingY: -10,
           initialVelocityX: (Math.random() - 0.5) * 4,
           initialVelocityY: 0,
-          radius: mass * 2,
+          initialAngleVelocity: (Math.random() - 0.5) * 0.2,
+          initialAngle: Math.random(),
+          radius: mass * 10,
           mass,
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
@@ -102,7 +113,9 @@ export default class Snowfall {
     this.spawn();
 
     for (let i=0; i < this.snows.length; i++) {
-      this.snows[i].applyGravity(new Vector2(0, 1));
+
+      this.snows[i].applyGravity(this.orientationVector);
+
       this.snows[i].applyLateralEntropy(c * 0.01) 
       this.snows[i].applyFriction(1);
 
@@ -134,11 +147,31 @@ export default class Snowfall {
         
         const radius = snow.config.radius * m;
 
-        this.context.beginPath();
         const { x, y } = snow.position;
-        this.context.arc(x, y, radius, 0, Math.PI * 2);
-        this.context.fillStyle = 'white';
+
+        this.context.save();
+
+        this.context.translate(x * m, y * m);
+        this.context.rotate(snow.angle);
+        this.context.transform(1, 0, 0, 1, 0, 0);
+        this.context.translate(-x * m, -y * m);
+
+        this.context.beginPath();
+        
+        const size = radius * m + 20;
+        this.context.drawImage(
+          this.image,
+          x * m - size / 2,
+          y * m - size / 2,
+          radius * m,
+          radius * m,
+        );
+        
+        // this.context.arc(x, y, radius, 0, Math.PI * 2);
+        // this.context.fillStyle = 'white';
         this.context.fill();
+
+        this.context.restore();
       }
     }
   }
@@ -164,5 +197,16 @@ export default class Snowfall {
     });
 
     window.addEventListener('resize', this.resizeHandler.bind(this));
+
+    const handleOrientation = event => {
+      this.orientationVector = Vector2().unit().rotateTo(event.alpha * Math.PI / 180);
+      alert(event.alpha);
+    }
+
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', handleOrientation, true);
+    }else {
+      alert('nope');
+    }
   }
 }

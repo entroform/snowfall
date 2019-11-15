@@ -11,6 +11,8 @@ export const SNOW_DEFAULT_CONFIG = {
   startingY: 0,
   initialVelocityX: 0,
   initialVelocityY: 0,
+  initialAngleVelocity: 0.05,
+  initialAngle: 0.1,
   seedX: 0,
   seedY: 0,
   radius: 10,
@@ -31,6 +33,10 @@ export default class Snow {
       this.config.initialVelocityY,
     );
     this.acceleration = new Vector2();
+
+    this.angleAcceleration = 0;
+    this.angleVelocity = this.config.initialAngleVelocity;
+    this.angle = this.config.initialAngle;
 
     this.simplex = new SimplexNoise();
 
