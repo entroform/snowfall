@@ -199,14 +199,10 @@ export default class Snowfall {
     window.addEventListener('resize', this.resizeHandler.bind(this));
 
     const handleOrientation = event => {
-      this.orientationVector = Vector2().unit().rotateTo(event.alpha * Math.PI / 180);
-      alert(event.alpha);
+      this.orientationVector = Vector2().unit().rotateTo(event.beta * Math.PI / 180);
+      alert(event);
     }
 
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', handleOrientation, true);
-    }else {
-      alert('nope');
-    }
+    window.addEventListener('deviceorientation', handleOrientation, true);
   }
 }
