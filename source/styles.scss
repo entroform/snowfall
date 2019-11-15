@@ -2,8 +2,8 @@
 
 #view {
   $__color-0: hsl(240, 100, 20);
-  $__color-1: hsl(220, 60, 40);
-  $__color-2: hsl(190, 100, 90);
+  $__color-1: hsl(220, 100, 30);
+  $__color-2: hsl(220, 100, 50);
 
-  background-image: linear-gradient($__color-0 30%, $__color-1, $__color-2);
+  background-image: linear-gradient($__color-0, $__color-1, $__color-2);
 }

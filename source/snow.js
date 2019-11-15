@@ -5,17 +5,19 @@ import {
 import SimplexNoise from 'simplex-noise';
 
 export const SNOW_DEFAULT_CONFIG = {
-  mass: 1,
-  maximumSpeed: 10,
-  startingX: 0,
-  startingY: 0,
+  initialAngle: 0.1,
+  initialAngleVelocity: 0.05,
   initialVelocityX: 0,
   initialVelocityY: 0,
-  initialAngleVelocity: 0.05,
-  initialAngle: 0.1,
+  mass: 1,
+  maximumSpeed: 100,
+  radius: 10,
   seedX: 0,
   seedY: 0,
-  radius: 10,
+  startingX: 0,
+  startingY: 0,
+  imageType: 0,
+  opacity: 1,
 };
 
 export default class Snow {
@@ -81,19 +83,21 @@ export default class Snow {
   }
 
   attract(position) {
-    const directionForce = Vector2.subtract(this.position, position);
+    const directionForce = Vector2.subtract(
+      this.position,
+      position
+    );
     const distance = directionForce.magnitude;
 
-    if (distance < 400 && distance > 30) {      
+    if (distance < 10000) {
       const G = 2;
       const mass = 1000;
       const strength = (G * mass * this.config.mass) / (distance * distance);
       // const strength = 1;
-
       directionForce.normalize();
       directionForce.multiply(-strength);
       directionForce.multiply(3);
-      this.applyForce(directionForce);
+      this.applyForce(new Vector2(Math.cos(distance), Math.sin(distance)));
     }
   }
 
@@ -101,19 +105,10 @@ export default class Snow {
     const directionForce = Vector2.subtract(this.position, position);
     const distance = directionForce.magnitude;
 
-    if (distance < 500) {      
-      const G = 3;
-      const mass = 1000;
-      const strength = (G * mass * this.config.mass) / (distance * distance);
-      // const strength = 1;
+    directionForce.normalize();
+    directionForce.multiply(10000);
 
-      directionForce.normalize();
-      directionForce.multiply(strength);
-
-      directionForce.multiply(10000);
-
-      this.applyForce(directionForce);
-    }
+    this.applyForce(directionForce);
   }
 
   update() {

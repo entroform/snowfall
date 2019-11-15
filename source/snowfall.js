@@ -5,14 +5,19 @@ import {
   Ticker,
   Vector2,
   DOMImage,
+  Num,
 } from '@nekobird/rocket';
 import Snow from './snow';
 
-import SnowImage from './snow.png';
+import SnowImage1 from './snow.png';
+import SnowImage2 from './snow-1.png';
+import SnowImage3 from './snow-2.png';
 
 export const SNOWFALL_DEFAULT_CONFIG = {
   targetElement: null,
   resolutionMultiplier: 2,
+  maximumNumberOfSnowParticles: 1000,
+  snowParticleTypes: [SnowImage1, SnowImage2, SnowImage3],
 };
 
 export default class Snowfall {
@@ -29,6 +34,7 @@ export default class Snowfall {
     this.snows = [];
     this.pointerPosition = new Vector2();
     this.mouseIsDown = false;
+    this.images = [];
 
     this.orientationVector = new Vector2(0, 1);
   }
@@ -43,10 +49,14 @@ export default class Snowfall {
     this.createCanvasElement();
     this.insertCanvasElement();
 
-    DOMImage.loadImageFromSource(SnowImage).then(data => {
-      this.image = data.image;
-      this.ticker.start();
-    });
+    Promise.all(
+      this.config.snowParticleTypes.map(image => {
+        return DOMImage.loadImageFromSource(image).then(data => {
+          this.images.push(data.image);
+          return Promise.resolve();
+        });
+      })
+    ).then(() => this.ticker.start());
     
     this.listen();
   }
@@ -87,7 +97,7 @@ export default class Snowfall {
   }
 
   spawn() {
-    if (this.snows.length <= 300) {
+    if (this.snows.length < this.config.maximumNumberOfSnowParticles) {
       const mass = 0.5 + Math.random();
       const snow = new Snow(
         {
@@ -96,11 +106,13 @@ export default class Snowfall {
           initialVelocityX: (Math.random() - 0.5) * 4,
           initialVelocityY: 0,
           initialAngleVelocity: (Math.random() - 0.5) * 0.2,
-          initialAngle: Math.random(),
-          radius: mass * 10,
+          initialAngle: Math.random() + 0.1,
+          radius: mass * 5 + 2,
           mass,
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
+          imageType: Num.random(this.images.length - 1),
+          opacity: Math.random(),
         },
         this,
       );
@@ -119,16 +131,8 @@ export default class Snowfall {
       this.snows[i].applyLateralEntropy(c * 0.01) 
       this.snows[i].applyFriction(1);
 
-      if (this.mouseIsDown) {
-        this.snows[i].attract(this.pointerPosition);
-      }
-      if (this.explode) {
-        this.snows[i].repulse(this.pointerPosition);
-      }
-
       this.snows[i].update();
     }
-    this.explode = false;
 
     this.draw(c);
   }
@@ -157,14 +161,15 @@ export default class Snowfall {
         this.context.translate(-x * m, -y * m);
 
         this.context.beginPath();
-        
-        const size = radius * m + 20;
+        const size = radius * m;
+        this.context.globalAlpha = snow.config.opacity;
+        // this.context.globalAlpha = 1;
         this.context.drawImage(
-          this.image,
-          x * m - size / 2,
-          y * m - size / 2,
-          radius * m,
-          radius * m,
+          this.images[snow.config.imageType],
+          x * m - (size / 2),
+          y * m - (size / 2),
+          size,
+          size,
         );
         
         // this.context.arc(x, y, radius, 0, Math.PI * 2);
@@ -184,16 +189,15 @@ export default class Snowfall {
 
   listen() {
     window.addEventListener('mousemove', event => {
-      const m = this.config.resolutionMultiplier;
-      this.pointerPosition.x = event.pageX * m;
-      this.pointerPosition.y = event.pageY * m;
+      this.pointerPosition.x = event.pageX;
+      this.pointerPosition.y = event.pageY;
     });
 
     window.addEventListener('mousedown', () => this.mouseIsDown = true);
 
     window.addEventListener('mouseup', () => {
       this.mouseIsDown = false;
-      this.explode = true;
+      this.explodeCounter = 0;
     });
 
     window.addEventListener('resize', this.resizeHandler.bind(this));
