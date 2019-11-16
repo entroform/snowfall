@@ -1,11 +1,11 @@
 import {
-  DOMUtil,
+  DOMImage,
   DOMTraverse,
-  Viewport,
+  DOMUtil,
+  Num,
   Ticker,
   Vector2,
-  DOMImage,
-  Num,
+  Viewport,
 } from '@nekobird/rocket';
 import Snow from './snow';
 
@@ -31,15 +31,12 @@ export default class Snowfall {
 
     this.ticker = new Ticker({
       loopForever: true,
-      onTick: (...args) => this.tick.apply(this, args)
+      onTick: (...args) => this.tick.apply(this, args),
     });
 
     this.snows = [];
-    this.pointerPosition = new Vector2();
-    this.mouseIsDown = false;
-    this.images = [];
 
-    this.orientationVector = new Vector2(0, 1);
+    this.snowParticleImages = [];
   }
 
   setConfig(config) {
@@ -55,13 +52,15 @@ export default class Snowfall {
     if (this.config.snowParticleImages.length > 0) {
       Promise.all(
         this.config.snowParticleImages.map(image => {
-          return DOMImage.loadImageFromSource(image).then(data => {
-            this.images.push(data.image);
-            return Promise.resolve();
-          });
+          return DOMImage
+            .loadImageFromSource(image)
+            .then(data => {
+              this.snowParticleImages.push(data.image);
+              return Promise.resolve();
+            });
         })
       ).then(() => this.ticker.start());
-      
+
       this.listen();
     }
   }
@@ -111,7 +110,7 @@ export default class Snowfall {
           mass,
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
-          imageType: Num.random(this.images.length - 1),
+          imageType: Num.random(this.snowParticleImages.length - 1),
           opacity: Math.random(),
         },
         this,
@@ -124,9 +123,9 @@ export default class Snowfall {
   tick(n, c) {
     this.spawn();
 
-    for (let i=0; i < this.snows.length; i++) {
+    for (let i = 0; i < this.snows.length; i++) {
 
-      this.snows[i].applyGravity(this.orientationVector);
+      this.snows[i].applyGravity(Vector2.down());
 
       this.snows[i].applyLateralEntropy(c * 0.01) 
       this.snows[i].applyFriction(1);
@@ -165,7 +164,7 @@ export default class Snowfall {
         this.context.globalAlpha = snow.config.opacity;
         // this.context.globalAlpha = 1;
         this.context.drawImage(
-          this.images[snow.config.imageType],
+          this.snowParticleImages[snow.config.imageType],
           x * m - (size / 2),
           y * m - (size / 2),
           size,
