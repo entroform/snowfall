@@ -1,5 +1,6 @@
 import {
   DOMImage,
+  DOMScroll,
   DOMTraverse,
   DOMUtil,
   Num,
@@ -14,6 +15,8 @@ export const SNOWFALL_DEFAULT_CONFIG = {
   resolutionMultiplier: 2,
   maximumNumberOfSnowParticles: 1000,
   snowParticleImages: [],
+  fadeAfterScrollThreshold: true,
+  fadeScrollThreshold: 500,
   prepareCanvasElement: function(canvasElement) {
     canvasElement.style.width = '100vw';
     canvasElement.style.height = '100vh';
@@ -26,7 +29,6 @@ export const SNOWFALL_DEFAULT_CONFIG = {
 export default class Snowfall {
   constructor(config) {
     this.config = {...SNOWFALL_DEFAULT_CONFIG};
-
     this.setConfig(config);
 
     this.ticker = new Ticker({
@@ -35,7 +37,6 @@ export default class Snowfall {
     });
 
     this.snows = [];
-
     this.snowParticleImages = [];
   }
 
@@ -120,20 +121,17 @@ export default class Snowfall {
     }
   }
 
-  tick(n, c) {
+  tick(data) {
     this.spawn();
 
     for (let i = 0; i < this.snows.length; i++) {
-
       this.snows[i].applyGravity(Vector2.down());
-
-      this.snows[i].applyLateralEntropy(c * 0.01) 
+      this.snows[i].applyLateralEntropy(data[2] * 0.01);
       this.snows[i].applyFriction(1);
-
       this.snows[i].update();
     }
 
-    this.draw(c);
+    this.draw(data[2]);
   }
 
   draw() {
@@ -162,6 +160,11 @@ export default class Snowfall {
         this.context.beginPath();
         const size = radius * m;
         this.context.globalAlpha = snow.config.opacity;
+        snow.config.opacity = snow.config.opacity - 0.002;
+        if (snow.config.opacity < 0) {
+          snow.config.opacity = 0;
+        }
+
         // this.context.globalAlpha = 1;
         this.context.drawImage(
           this.snowParticleImages[snow.config.imageType],
@@ -170,7 +173,6 @@ export default class Snowfall {
           size,
           size,
         );
-        
         // this.context.arc(x, y, radius, 0, Math.PI * 2);
         // this.context.fillStyle = 'white';
         this.context.fill();
@@ -182,12 +184,17 @@ export default class Snowfall {
 
   resizeHandler() {
     const m = this.config.resolutionMultiplier;
-    this.canvasElement.width = Viewport.width * m;
+    this.canvasElement.width  = Viewport.width  * m;
     this.canvasElement.height = Viewport.height * m;
+  }
+
+  scrollHandler() {
+    DOMScroll.scrollTop()
   }
 
   listen() {
     window.addEventListener('resize', this.resizeHandler.bind(this));
+    // window.addEventListener('scroll', this.scrollHandler.bind(this));
   }
 }
 

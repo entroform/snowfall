@@ -18,6 +18,7 @@ export const SNOW_DEFAULT_CONFIG = {
   startingY: 0,
   imageType: 0,
   opacity: 1,
+  life: 500,
 };
 
 export default class Snow {
@@ -78,8 +79,7 @@ export default class Snow {
     const { seedX, seedY } = this.config;
     const x = this.simplex.noise2D(seedX + t, seedY)
     const y = this.simplex.noise2D(seedX, seedY + t)
-    // const force = new Vector2(x * 0.5, y * 0.01);
-    const force = new Vector2(x * 0.2 + 0.2, y * 0.01);
+    const force = new Vector2(x * 0.2, y * 0.01);
     this.applyForce(force);
   }
 
@@ -98,7 +98,9 @@ export default class Snow {
       directionForce.normalize();
       directionForce.multiply(-strength);
       directionForce.multiply(3);
-      this.applyForce(new Vector2(Math.cos(distance), Math.sin(distance)));
+      this.applyForce(
+        new Vector2(Math.cos(distance), Math.sin(distance))
+      );
     }
   }
 
@@ -115,21 +117,19 @@ export default class Snow {
   update() {
     this.life--;
 
-    if (this.life <= 0) {
-      this.die();
-    }
-
     this.velocity.add(this.acceleration).limit(10);
     this.position.add(this.velocity);
     this.acceleration.multiply(0);
 
     this.angleVelocity += this.angleAcceleration;
-    this.angleVelocity = Num.clamp(this.angleVelocity, -0.1, 0.1);
+    this.angleVelocity = Num.clamp(this.angleVelocity, -0.01, 0.01);
     this.angle += this.angleVelocity;
 
+    // Reset Snow after it reach a certain point.
     if (this.position.y > this.snowfall.canvasElement.height) {
       this.position.x = Math.random() * this.snowfall.canvasElement.width;
       this.position.y = -10;
+      this.config.opacity = Math.random() + 0.2;
       this.velocity.multiply(0);
     }
   }

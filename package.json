@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npx parcel ./source/index.html",
     "build": "npx parcel build ./source/index.html --out-dir build/ --public-url /",
-    "build-snowfall": "npx parcel build ./source/snowfall.js --out-dir build-snowfall/",
+    "build:snowfall": "npx parcel build ./source/snowfall.js --out-dir build-snowfall/",
+    "clean": "rimraf dist build-snowfall .cache",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,7 +21,8 @@
   },
   "homepage": "https://github.com/nekobird/snowfall#readme",
   "dependencies": {
-    "@nekobird/rocket": "0.0.131",
+    "@babel/runtime": "^7.7.2",
+    "@nekobird/rocket": "0.0.135",
     "simplex-noise": "^2.4.0"
   },
   "devDependencies": {
@@ -30,6 +32,7 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-typescript": "^7.7.2",
     "cssnano": "^4.1.10",
+    "rimraf": "^3.0.0",
     "sass": "^1.23.3"
   }
 }
