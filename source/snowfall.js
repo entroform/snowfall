@@ -6,7 +6,6 @@ import {
   Num,
   Ticker,
   Vector2,
-  Viewport,
 } from '@nekobird/rocket';
 import Snow from './snow';
 
@@ -15,9 +14,8 @@ export const SNOWFALL_DEFAULT_CONFIG = {
   resolutionMultiplier: 2,
   maximumNumberOfSnowParticles: 300,
   snowParticleImages: [],
-  // dragCoefficient: 0.0075,
-  dragCoefficient: 0,
-  spawnTickDelay: 8,
+  dragCoefficient: 0.0075,
+  numberOfTicksBeforeSpawn: 8,
   insertCanvasElement: (canvasElement, targetElement) => {
     DOMUtil.prependChild(
       targetElement,
@@ -127,7 +125,7 @@ export default class Snowfall {
   }
 
   tick(data) {
-    if (data[2] % this.config.spawnTickDelay === 0) {
+    if (data[2] % this.config.numberOfTicksBeforeSpawn === 0) {
       this.spawn();
     }
 
