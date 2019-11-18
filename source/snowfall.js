@@ -12,11 +12,15 @@ import Snow from './snow';
 
 export const SNOWFALL_DEFAULT_CONFIG = {
   targetElement: null,
-  resolutionMultiplier: 2,
+  resolutionMultiplier: window.devicePixelRatio,
   maximumNumberOfSnowParticles: 1000,
   snowParticleImages: [],
-  fadeAfterScrollThreshold: true,
-  fadeScrollThreshold: 500,
+  insertCanvasElement: (canvasElement, targetElement) => {
+    DOMUtil.prependChild(
+      targetElement,
+      canvasElement,
+    );
+  },
   prepareCanvasElement: function(canvasElement) {
     canvasElement.style.width = '100vw';
     canvasElement.style.height = '100vh';
@@ -80,10 +84,7 @@ export default class Snowfall {
         this.canvasElement
       )
     ) {
-      DOMUtil.prependChild(
-        this.config.targetElement,
-        this.canvasElement,
-      );
+      this.config.insertCanvasElement(this.canvasElement, this.config.targetElement);
 
       this.config.prepareCanvasElement(this.canvasElement);
       this.resizeCanvas();
@@ -91,9 +92,9 @@ export default class Snowfall {
   }
 
   resizeCanvas() {
-    const { resolutionMultiplier } = this.config;
-    this.canvasElement.width = Viewport.width * resolutionMultiplier;
-    this.canvasElement.height = Viewport.height * resolutionMultiplier;
+    const m = this.config.resolutionMultiplier;
+    this.canvasElement.width = this.canvasElement.offsetWidth * m;
+    this.canvasElement.height = this.canvasElement.offsetHeight * m;
   }
 
   spawn() {
@@ -184,8 +185,8 @@ export default class Snowfall {
 
   resizeHandler() {
     const m = this.config.resolutionMultiplier;
-    this.canvasElement.width  = Viewport.width  * m;
-    this.canvasElement.height = Viewport.height * m;
+    this.canvasElement.width  = this.canvasElement.offsetWidth * m;
+    this.canvasElement.height = this.canvasElement.offsetHeight * m;
   }
 
   scrollHandler() {
@@ -194,7 +195,6 @@ export default class Snowfall {
 
   listen() {
     window.addEventListener('resize', this.resizeHandler.bind(this));
-    // window.addEventListener('scroll', this.scrollHandler.bind(this));
   }
 }
 

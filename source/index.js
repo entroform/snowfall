@@ -10,6 +10,7 @@ const viewElement = document.getElementById('view');
 
 const snowfall = new Snowfall({
   targetElement: viewElement,
+  maximumNumberOfSnowParticles: 10,
   snowParticleImages: [
     image1, image2, image3,
   ],
