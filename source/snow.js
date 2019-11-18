@@ -150,7 +150,7 @@ export default class Snow {
       || this.life <= 0
     ) {
       this.position.x = Math.random() * this.snowfall.canvasElement.offsetWidth;
-      this.position.y = -10;
+      this.position.y = -50;
       this.life = this.config.startingLife;
       this.opacity = this.config.startingOpacity;
       this.velocity.multiply(0);

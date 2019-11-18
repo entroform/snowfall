@@ -12,10 +12,12 @@ import Snow from './snow';
 
 export const SNOWFALL_DEFAULT_CONFIG = {
   targetElement: null,
-  resolutionMultiplier: window.devicePixelRatio,
-  maximumNumberOfSnowParticles: 1000,
+  resolutionMultiplier: 2,
+  maximumNumberOfSnowParticles: 300,
   snowParticleImages: [],
-  dragCoefficient: 0.0075,
+  // dragCoefficient: 0.0075,
+  dragCoefficient: 0,
+  spawnTickDelay: 8,
   insertCanvasElement: (canvasElement, targetElement) => {
     DOMUtil.prependChild(
       targetElement,
@@ -104,12 +106,12 @@ export default class Snowfall {
       const snow = new Snow(
         {
           startingX: Math.random() * this.canvasElement.offsetWidth,
-          startingY: -10,
+          startingY: -50,
           initialVelocityX: (Math.random() - 0.5) * 4,
           initialVelocityY: 0,
           initialAngleVelocity: (Math.random() - 0.5) * 0.2,
           initialAngle: Math.random() + 0.1,
-          radius: mass * 5 + 2,
+          radius: Num.random([40, 50], true),
           mass,
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
@@ -125,7 +127,9 @@ export default class Snowfall {
   }
 
   tick(data) {
-    this.spawn();
+    if (data[2] % this.config.spawnTickDelay === 0) {
+      this.spawn();
+    }
 
     for (let i = 0; i < this.snows.length; i++) {
       this.snows[i].applyGravity(Vector2.down());
