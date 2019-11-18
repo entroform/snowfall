@@ -1,4 +1,4 @@
-
+fig
 const path = require('path');
 const fs = require('fs');
 
@@ -10,7 +10,7 @@ const files = fs.readdirSync(path.resolve(__dirname, 'source'));
 const htmlFiles = files.filter(fileName => /\.html$/.test(fileName));
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: path.resolve(__dirname, 'source/assets/javascripts/index.js'),
   output: {
     path: path.resolve(__dirname, 'build'),

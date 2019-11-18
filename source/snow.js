@@ -17,8 +17,8 @@ export const SNOW_DEFAULT_CONFIG = {
   startingX: 0,
   startingY: 0,
   imageType: 0,
-  opacity: 1,
-  life: 500,
+  startingOpacity: 1,
+  startingLife: 2000,
 };
 
 export default class Snow {
@@ -40,6 +40,9 @@ export default class Snow {
     this.angleAcceleration = 0;
     this.angleVelocity = this.config.initialAngleVelocity;
     this.angle = this.config.initialAngle;
+
+    this.opacity = this.config.startingOpacity;
+    this.life = this.config.startingLife;
 
     this.simplex = new SimplexNoise();
 
@@ -63,10 +66,10 @@ export default class Snow {
     if (friction !== 0) {
       const force = this.velocity
         .clone()
+        .multiply(-1)
         .normalize()
-        .multiply(-friction)
+        .multiply(friction)
         .multiply(this.config.mass);
-
       this.applyForce(force);
     }
   }
@@ -81,6 +84,16 @@ export default class Snow {
     const y = this.simplex.noise2D(seedX, seedY + t)
     const force = new Vector2(x * 0.2, y * 0.01);
     this.applyForce(force);
+  }
+
+  applyDragForce(dragCoefficient) {
+    const speed = this.velocity.magnitude;
+    const dragMagnitude = dragCoefficient * speed * speed;
+    const drag = Vector2.clone(this.velocity);
+    drag.multiply(-1);
+    drag.normalize();
+    drag.multiply(dragMagnitude);
+    this.applyForce(drag);
   }
 
   attract(position) {
@@ -125,11 +138,21 @@ export default class Snow {
     this.angleVelocity = Num.clamp(this.angleVelocity, -0.01, 0.01);
     this.angle += this.angleVelocity;
 
+    this.opacity = Num.transform(
+      this.life,
+      [this.config.startingLife, 0],
+      [this.config.startingOpacity, 0],
+    );
+
     // Reset Snow after it reach a certain point.
-    if (this.position.y > this.snowfall.canvasElement.height) {
-      this.position.x = Math.random() * this.snowfall.canvasElement.width;
+    if (
+      this.position.y > this.snowfall.canvasElement.height
+      || this.life <= 0
+    ) {
+      this.position.x = Math.random() * this.snowfall.canvasElement.offsetWidth;
       this.position.y = -10;
-      this.config.opacity = Math.random() + 0.2;
+      this.life = this.config.startingLife;
+      this.opacity = this.config.startingOpacity;
       this.velocity.multiply(0);
     }
   }

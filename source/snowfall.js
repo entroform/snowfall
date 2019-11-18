@@ -15,6 +15,7 @@ export const SNOWFALL_DEFAULT_CONFIG = {
   resolutionMultiplier: window.devicePixelRatio,
   maximumNumberOfSnowParticles: 1000,
   snowParticleImages: [],
+  dragCoefficient: 0.0075,
   insertCanvasElement: (canvasElement, targetElement) => {
     DOMUtil.prependChild(
       targetElement,
@@ -93,7 +94,7 @@ export default class Snowfall {
 
   resizeCanvas() {
     const m = this.config.resolutionMultiplier;
-    this.canvasElement.width = this.canvasElement.offsetWidth * m;
+    this.canvasElement.width  = this.canvasElement.offsetWidth  * m;
     this.canvasElement.height = this.canvasElement.offsetHeight * m;
   }
 
@@ -102,7 +103,7 @@ export default class Snowfall {
       const mass = 0.5 + Math.random();
       const snow = new Snow(
         {
-          startingX: Math.random() * this.canvasElement.width,
+          startingX: Math.random() * this.canvasElement.offsetWidth,
           startingY: -10,
           initialVelocityX: (Math.random() - 0.5) * 4,
           initialVelocityY: 0,
@@ -113,7 +114,8 @@ export default class Snowfall {
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
           imageType: Num.random(this.snowParticleImages.length - 1),
-          opacity: Math.random(),
+          startingOpacity: Math.random(),
+          startingLife: 1000,
         },
         this,
       );
@@ -129,6 +131,7 @@ export default class Snowfall {
       this.snows[i].applyGravity(Vector2.down());
       this.snows[i].applyLateralEntropy(data[2] * 0.01);
       this.snows[i].applyFriction(1);
+      this.snows[i].applyDragForce(this.config.dragCoefficient);
       this.snows[i].update();
     }
 
@@ -160,11 +163,8 @@ export default class Snowfall {
 
         this.context.beginPath();
         const size = radius * m;
-        this.context.globalAlpha = snow.config.opacity;
-        snow.config.opacity = snow.config.opacity - 0.002;
-        if (snow.config.opacity < 0) {
-          snow.config.opacity = 0;
-        }
+
+        this.context.globalAlpha = snow.opacity;
 
         // this.context.globalAlpha = 1;
         this.context.drawImage(
@@ -185,7 +185,7 @@ export default class Snowfall {
 
   resizeHandler() {
     const m = this.config.resolutionMultiplier;
-    this.canvasElement.width  = this.canvasElement.offsetWidth * m;
+    this.canvasElement.width  = this.canvasElement.offsetWidth  * m;
     this.canvasElement.height = this.canvasElement.offsetHeight * m;
   }
 
