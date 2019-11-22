@@ -1,12 +1,18 @@
 import {
-  DOMImage,
-  DOMScroll,
-  DOMTraverse,
-  DOMUtil,
-  Num,
-  Ticker,
-  Vector2,
-} from '@nekobird/rocket';
+  scrollTop,
+  prependChild,
+  hasDescendant,
+  loadImageFromSource,
+} from '@nekobird/doko';
+
+import {
+  random,
+} from '@nekobird/piko';
+
+import Ticker from '@nekobird/ticker';
+
+import { Vector2 } from '@nekobird/vector2';
+
 import Snow from './snow';
 
 export const SNOWFALL_DEFAULT_CONFIG = {
@@ -17,7 +23,7 @@ export const SNOWFALL_DEFAULT_CONFIG = {
   dragCoefficient: 0.0075,
   numberOfTicksBeforeSpawn: 8,
   insertCanvasElement: (canvasElement, targetElement) => {
-    DOMUtil.prependChild(
+    prependChild(
       targetElement,
       canvasElement,
     );
@@ -58,8 +64,7 @@ export default class Snowfall {
     if (this.config.snowParticleImages.length > 0) {
       Promise.all(
         this.config.snowParticleImages.map(image => {
-          return DOMImage
-            .loadImageFromSource(image)
+          return loadImageFromSource(image)
             .then(data => {
               this.snowParticleImages.push(data.image);
               return Promise.resolve();
@@ -80,7 +85,7 @@ export default class Snowfall {
     if (
       this.config.targetElement
       && this.canvasElement
-      && !DOMTraverse.hasDescendant(
+      && !hasDescendant(
         this.config.targetElement,
         this.canvasElement
       )
@@ -109,11 +114,11 @@ export default class Snowfall {
           initialVelocityY: 0,
           initialAngleVelocity: (Math.random() - 0.5) * 0.2,
           initialAngle: Math.random() + 0.1,
-          radius: Num.random([40, 50], true),
+          radius: random([40, 50], true),
           mass,
           seedX: Math.random() * 1000,
           seedY: Math.random() * 1000,
-          imageType: Num.random(this.snowParticleImages.length - 1),
+          imageType: random(this.snowParticleImages.length - 1),
           startingOpacity: Math.random(),
           startingLife: 1000,
         },
@@ -192,7 +197,7 @@ export default class Snowfall {
   }
 
   scrollHandler() {
-    DOMScroll.scrollTop()
+    scrollTop()
   }
 
   listen() {

@@ -2,27 +2,30 @@
   "name": "snowfall",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "npx parcel ./source/index.html",
-    "build": "npx parcel build ./source/index.html --out-dir build/ --public-url /",
-    "build:snowfall": "npx parcel build ./source/snowfall.js --out-dir build-snowfall/",
-    "clean": "rimraf dist build-snowfall .cache",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "homepage": "https://github.com/nekobird/snowfall#readme",
+  "bugs": {
+    "url": "https://github.com/nekobird/snowfall/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nekobird/snowfall.git"
   },
-  "author": "Andrew Prasetya",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/nekobird/snowfall/issues"
+  "author": "Andrew Prasetya",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx parcel build ./source/index.html --out-dir build/ --public-url /",
+    "build:snowfall": "npx parcel build ./source/snowfall.js --out-dir build-snowfall/",
+    "clean": "rimraf dist build-snowfall .cache",
+    "start": "npx parcel ./source/index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/nekobird/snowfall#readme",
   "dependencies": {
     "@babel/runtime": "^7.7.2",
-    "@nekobird/rocket": "0.0.135",
+    "@nekobird/doko": "0.0.1",
+    "@nekobird/piko": "0.0.2",
+    "@nekobird/ticker": "0.0.1",
+    "@nekobird/vector2": "0.0.1",
     "simplex-noise": "^2.4.0"
   },
   "devDependencies": {

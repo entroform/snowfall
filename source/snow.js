@@ -1,7 +1,9 @@
 import {
-  Num,
-  Vector2,
-} from '@nekobird/rocket';
+  clamp,
+  transform,
+} from '@nekobird/piko';
+import { Vector2 } from '@nekobird/vector2';
+
 import SimplexNoise from 'simplex-noise';
 
 export const SNOW_DEFAULT_CONFIG = {
@@ -135,10 +137,10 @@ export default class Snow {
     this.acceleration.multiply(0);
 
     this.angleVelocity += this.angleAcceleration;
-    this.angleVelocity = Num.clamp(this.angleVelocity, -0.01, 0.01);
+    this.angleVelocity = clamp(this.angleVelocity, -0.01, 0.01);
     this.angle += this.angleVelocity;
 
-    this.opacity = Num.transform(
+    this.opacity = transform(
       this.life,
       [this.config.startingLife, 0],
       [this.config.startingOpacity, 0],
