@@ -111,9 +111,10 @@ export default class Snow {
       const mass = 1000;
       const strength = (G * mass * this.config.mass) / (distance * distance);
       // const strength = 1;
-      directionForce.normalize();
-      directionForce.multiply(-strength);
-      directionForce.multiply(3);
+      directionForce
+        .normalize()
+        .multiply(-strength)
+        .multiply(3);
       this.applyForce(
         new Vector2(Math.cos(distance), Math.sin(distance))
       );
@@ -124,8 +125,9 @@ export default class Snow {
     const directionForce = Vector2.subtract(this.position, position);
     const distance = directionForce.magnitude;
 
-    directionForce.normalize();
-    directionForce.multiply(10000);
+    directionForce
+      .normalize()
+      .multiply(10000);
 
     this.applyForce(directionForce);
   }
