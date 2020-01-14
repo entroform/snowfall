@@ -4,14 +4,13 @@ import {
   hasDescendant,
   loadImageFromSource,
 } from '@nekobird/doko';
-
 import {
   random,
 } from '@nekobird/piko';
-
 import Ticker from '@nekobird/ticker';
-
-import { Vector2 } from '@nekobird/vector2';
+import {
+  Vector2,
+} from '@nekobird/vector2';
 
 import Snow from './snow';
 
@@ -29,11 +28,11 @@ export const SNOWFALL_DEFAULT_CONFIG = {
     );
   },
   prepareCanvasElement: function(canvasElement) {
-    canvasElement.style.width = '100vw';
-    canvasElement.style.height = '100vh';
-    canvasElement.style.maxWidth = '100%';
+    canvasElement.style.width     = '100vw';
+    canvasElement.style.height    = '100vh';
+    canvasElement.style.maxWidth  = '100%';
     canvasElement.style.maxHeight = '100%';
-    canvasElement.style.margin = '0';
+    canvasElement.style.margin    = '0';
   },
 };
 

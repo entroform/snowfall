@@ -91,10 +91,11 @@ export default class Snow {
   applyDragForce(dragCoefficient) {
     const speed = this.velocity.magnitude;
     const dragMagnitude = dragCoefficient * speed * speed;
-    const drag = Vector2.clone(this.velocity);
-    drag.multiply(-1);
-    drag.normalize();
-    drag.multiply(dragMagnitude);
+    const drag = Vector2
+      .clone(this.velocity)
+      .multiply(-1)
+      .normalize()
+      .multiply(dragMagnitude);
     this.applyForce(drag);
   }
 
